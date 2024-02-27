@@ -1,0 +1,28 @@
+title Shipping Ships API
+
+participant Client
+participant Python
+participant JSONServer
+participant NSS Handler
+
+participant Views
+participant Database
+
+Client->>Python:GET request to "/ships"
+Python->>JSONServer:Run do_GET() method
+JSONServer->NSS Handler:run parse_url method, pass in path
+note over NSS Handler:build dictionary based on request path
+JSONServer<--NSS Handler:return python dictionary with query info
+box over JSONServer:check to see if query is for specific ship or all ships
+JSONServer->Views:run 'retrieve' method for specific ship or 'list' for all ships
+box over Views:connect with database and create Query string to request ship info
+Views->Database:request ship info
+Views<--Database:return ship query
+box over Views:serialize ship python info into JSON, (create list if list method)
+JSONServer<--Views:return serialized ship(list)
+JSONServer->NSS Handler:run "response" method, pass in JSON ship-list and test value
+box over Python
+
+box over NSS Handler:set and send response code/headers/body
+JSONServer<-NSS Handler:response set
+JSONServer-->>Client: Here's all yer ships (in JSON format)
